@@ -3,7 +3,6 @@ package com.fraud_auth_api.services;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +62,7 @@ public class LoginAttemptService {
         if(attemptFails.size()+1 >= 5){
             user.setStatus(UserStatus.BLOCKED);
             userRepository.save(user);
-            throw new IllegalArgumentException("Usuário excedeu numero de tentativas");
+            throw new IllegalArgumentException("User blocked");
         }
     }
     //verify suspect IP 
