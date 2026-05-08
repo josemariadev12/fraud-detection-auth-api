@@ -14,30 +14,23 @@ import com.fraud_auth_api.entity.User;
 import com.fraud_auth_api.enums.UserStatus;
 import com.fraud_auth_api.repository.LoginAttemptRepository;
 import com.fraud_auth_api.repository.UserRepository;
+import com.fraud_auth_api.security.JwtService;
 
 @Service
 public class LoginAttemptService {
     private final PasswordEncoder passwordEncoder;
     private final LoginAttemptRepository loginAttemptRepository;
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     public LoginAttemptService(LoginAttemptRepository loginAttemptRepository, 
-    PasswordEncoder passwordEncoder, UserRepository userRepository){
+    PasswordEncoder passwordEncoder, UserRepository userRepository, JwtService jwtService){
         this.loginAttemptRepository = loginAttemptRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.jwtService =jwtService;
     }
 
-    //transforma ResponseDto -> login (mapper)
-    private LoginAttemptResponseDTO toDTO(LoginAttempt login){
-        return new LoginAttemptResponseDTO(login.getId(),
-        login.getUser().getId(),
-        login.getUser().getEmail(),
-        login.getTimestamp(),
-        login.getIp(),
-        login.isSuccess());
-
-    }
     //Attempt Register
     private LoginAttempt attemptRegister(User user, String ip, boolean success){
         LoginAttempt attempt =  new LoginAttempt();
@@ -97,9 +90,9 @@ public class LoginAttemptService {
         }
         //verifica se a senha da conta está correta e adiciona bloqueio
         if(passwordEncoder.matches(dto.getPassword(), user.getPassword())){
-            LoginAttempt login = attemptRegister(user, ip, true);
+            attemptRegister(user, ip, true);
             verifySuspectIP(user);
-            return toDTO(login);
+            return new LoginAttemptResponseDTO(user.getEmail(),user.getRole(),jwtService.generateToken(user));
         }else{
             attemptRegister(user, ip, false);
             verifyBlock(user);

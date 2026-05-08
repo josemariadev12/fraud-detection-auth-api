@@ -1,6 +1,7 @@
 package com.fraud_auth_api.dto;
 
-import java.time.LocalDateTime;
+
+import com.fraud_auth_api.enums.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,12 +14,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class LoginAttemptResponseDTO {
     
-        private Long id;
-        private Long userid;
-        private String email;
-        private LocalDateTime timestamp;
-        private String ip;
-        private boolean success;
+    
+     private String email;
+     private Role role;
+     private String token;
 
 }
 

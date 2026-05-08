@@ -27,6 +27,8 @@ public class AuthController {
     public ResponseEntity<LoginAttemptResponseDTO> login(@RequestBody @Valid LoginAttemptRequestDTO dto, HttpServletRequest request){
         String ip = request.getRemoteAddr();
         LoginAttemptResponseDTO initLogin = loginAttemptService.login(dto, ip);
+
+
         return ResponseEntity.ok(initLogin);
     }
 }
