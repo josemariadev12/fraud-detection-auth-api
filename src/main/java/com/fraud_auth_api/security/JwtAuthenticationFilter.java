@@ -27,8 +27,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
    @Override
    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse reponse,
     FilterChain filterChain) throws ServletException, IOException{
+        final String path = request.getServletPath();
         final String authHeader = request.getHeader("Authorization");
 
+        if(path.startsWith("/swagger-ui")
+            || path.startsWith("/v3/api-docs")
+            || path.startsWith("/auth")){
+                filterChain.doFilter(request, reponse);
+                return;
+            
+        }
         if(authHeader == null || !authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, reponse);
             return;
@@ -37,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         String email = jwtService.extractEmail(token);
         UserDetails user= userDetailsService.loadUserByUsername(email);
-        boolean valid = jwtService.validToken(user, token);
+        boolean valid = jwtService.isValidToken(user, token);
 
         if(valid){
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());

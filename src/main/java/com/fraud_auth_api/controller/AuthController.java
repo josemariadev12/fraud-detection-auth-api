@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fraud_auth_api.dto.AuthRequestDTO;
 import com.fraud_auth_api.dto.LoginAttemptRequestDTO;
 import com.fraud_auth_api.dto.LoginAttemptResponseDTO;
 import com.fraud_auth_api.services.LoginAttemptService;
@@ -31,4 +32,12 @@ public class AuthController {
 
         return ResponseEntity.ok(initLogin);
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthRequestDTO> refreshToken(@RequestBody AuthRequestDTO dto){
+        String newToken = loginAttemptService.newAcessToken(dto);
+        return ResponseEntity.ok(new AuthRequestDTO(newToken));
+    }
+
+
 }

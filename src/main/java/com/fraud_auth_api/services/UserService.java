@@ -41,7 +41,7 @@ public class UserService {
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setStatus(UserStatus.ACTIVE);
-        user.setRole(Role.USER);
+        user.setRole(Role.ROLE_USER);
 
         User savedUser = userRepository.save(user);
 

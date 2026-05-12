@@ -50,7 +50,7 @@ public class User implements UserDetails {
     getAuthorities(){ 
         return List.of(
                 new SimpleGrantedAuthority(
-                    "ROLE_" + role
+                    role.name()
                 )
             );}
 

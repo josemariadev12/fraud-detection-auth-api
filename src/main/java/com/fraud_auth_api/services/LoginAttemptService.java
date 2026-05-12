@@ -7,6 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fraud_auth_api.dto.AuthRequestDTO;
+import com.fraud_auth_api.dto.AuthResponseDTO;
 import com.fraud_auth_api.dto.LoginAttemptRequestDTO;
 import com.fraud_auth_api.dto.LoginAttemptResponseDTO;
 import com.fraud_auth_api.entity.LoginAttempt;
@@ -77,6 +79,7 @@ public class LoginAttemptService {
 
     }
 
+
     //login
     @Transactional(noRollbackFor = IllegalArgumentException.class)
     public LoginAttemptResponseDTO login(LoginAttemptRequestDTO dto, String ip){
@@ -90,14 +93,33 @@ public class LoginAttemptService {
         }
         //verifica se a senha da conta está correta e adiciona bloqueio
         if(passwordEncoder.matches(dto.getPassword(), user.getPassword())){
+
             attemptRegister(user, ip, true);
             verifySuspectIP(user);
-            return new LoginAttemptResponseDTO(user.getEmail(),user.getRole(),jwtService.generateToken(user));
+
+            String accessToken = jwtService.generateAcessToken(user);
+            String refreshToken = jwtService.generateRefreshToken(user);
+
+            return new LoginAttemptResponseDTO(user.getEmail(),user.getRole(),accessToken,refreshToken);
+
         }else{
             attemptRegister(user, ip, false);
             verifyBlock(user);
             throw new IllegalArgumentException("Senha invalida");
         }  
+    }
+
+    //use token to sign in (refresh and access)
+
+    public String newAcessToken(AuthRequestDTO dto){
+        
+        String email = jwtService.extractEmail(dto.getRefreshToken());
+     
+        User user = userRepository.findByEmail(email)
+        .orElseThrow(()-> new IllegalArgumentException("chave indevida"));
+        
+        String newToken = jwtService.generateAcessToken(user);
+        return newToken;
     }
 
 

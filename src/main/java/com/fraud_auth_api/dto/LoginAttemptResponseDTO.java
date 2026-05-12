@@ -17,7 +17,8 @@ public class LoginAttemptResponseDTO {
     
      private String email;
      private Role role;
-     private String token;
+     private String acessToken;
+     private String refreshToken;
 
 }
 

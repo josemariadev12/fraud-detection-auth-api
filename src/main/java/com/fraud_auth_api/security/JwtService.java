@@ -17,7 +17,9 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 public class JwtService {
-
+    
+    private final Long refreshToken = 1000L*60*60*24*7;
+    private final Long acessToken = 1000L*60*15; 
     @Value("${jwt.secret}") //local secret key
     private String secret; 
     private SecretKey secretKey;
@@ -59,11 +61,35 @@ public class JwtService {
     }
 
 
-    public boolean validToken(UserDetails user,String token){
+    public boolean isValidToken(UserDetails user,String token){
        final String email = extractEmail(token);
        return email.equals(user.getUsername());
     }
 
+    public String generateRefreshToken(User user){
+        String token = Jwts.builder()
+        .subject(user.getEmail())
+        .issuedAt(new Date())
+        .expiration(new Date(System.currentTimeMillis()+refreshToken))
+        .signWith(secretKey)
+        .compact();
+        return token;
+    }
+    
+    public String generateAcessToken(User user){
+        String token = Jwts.builder()
+        .subject(user.getEmail())
+        .claim("role", user.getRole())
+        .issuedAt(new Date())
+        .expiration(new Date(System.currentTimeMillis()+ acessToken))
+        .signWith(secretKey)
+        .compact();
+        return token;
+    }
+
+
+
+  
   
 
 }
